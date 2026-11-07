@@ -1,0 +1,145 @@
+# @cassismilcrip 運用プラン（x-algorithm ベース）
+
+[@_cassis_milk](https://x.com/_cassis_milk) の配信切り抜きアカウント [@cassismilcrip](https://x.com/cassismilcrip) を伸ばすための運用プラン。
+根拠は submodule の [`x-algorithm`](../../x-algorithm/)（2026-11-07 時点、commit `3b6919f`）。
+
+> **注意:** リポジトリ内の数値はコード上のデフォルト値。本番では設定システムで上書きされることがあり、一部のルール（botmaker の一部、Grox プロンプト）は非公開。
+> そのため「この通りにすれば必ず伸びる」ではなく「コード上こう動く」という前提で使う。
+
+---
+
+## 1. 「シャドウバン」の正体
+
+x-algorithm に「shadowban」という名前のラベルはない。実体は **アカウントや投稿に付くラベルによって、フォロワー以外へのおすすめから外れること**。
+
+- フォロー中アカウントの投稿は `TimelineHome`、フォロー外（おすすめ）の投稿は `TimelineHomeRecommendations` という別ルールで判定される
+  （`home-mixer/candidate_hydrators/vf_candidate_hydrator.rs:92-106`）
+- おすすめ側だけに追加で適用されるアカウントラベル（`visibility-filtering/rules/levels.rs:65-72`）:
+  `SpamHighRecall` / `Compromised` / `ReadOnly` / `ImpersonationHighPrecision` / `AbusiveHighRecall` / `DoNotAmplify`
+- 投稿ラベル: `SPAM_HIGH_RECALL` / `DO_NOT_AMPLIFY` / `MALICIOUS_URL`、および著作権（DMCA）メディア（`levels.rs:147-152, 348`）
+
+→ **フォロワーには見えるが、フォロー外の「おすすめ」には一切出ない**。これが「シャドウバンされている」と感じる状態。
+
+### ラベルの有効期限（多くは自然に外れる）
+
+| ラベル | 付く条件（コード上） | 期間 |
+| --- | --- | --- |
+| `SpamHighRecall`（アカウント） | 固定ポストに低品質/危険URL（`botmaker-rules/scarecrow/bot/PinnedLowQualityOrBadUrl.bot`） | 7日 |
+| `SpamHighRecall`（アカウント） | スパムスコア系（`abuse-enforcement-service/service-lib/rules/enforcement_user.yaml`） | 7日 / 30日 |
+| `AgathaSpamTopUser`（アカウント） | ブロック・スパム報告が「フォロー外からのいいね」に比べて多い | 7日 |
+| `RISKY_HIGH_VIZ_REPLY`（リプライ） | 他人のスレッドへのスパム的リプライ（Grox 判定） | 14日 / 30日 |
+| `SPAM_HIGH_RECALL`（投稿） | 速すぎる大量リプライ・意味のない文など | 30日（一部は無期限） |
+
+---
+
+## 2. まずやること：原因の特定
+
+1. **Under the Hood を確認する** → https://x.com/i/jf/under_the_hood
+   - X 公式の透明性ツール。期間内にアカウント・投稿へ付いた「表示を制限しうるラベル」と件数が見られる
+   - 表示文言「The account's posts are hidden from recommendations to non-followers」があれば、それがシャドウバンの原因
+   - ただし `NotGraduated` `EngagementSpammer` `AgathaSpamTopUser` `LOW_QUALITY` `DUPLICATE_CONTENT` `COPYPASTA_SPAM` などは**レポートに出ない**（`under-the-hood/strato/lib/underTheHoodLabels.strato`）
+   - パイロット中のため、レポートではなく案内文だけが出る場合もある
+2. **DMCA（著作権）通知が来ていないか確認する**（メール・通知）
+   - DMCA 対象の投稿はおすすめから外れ、表示されてもメディアが再生できなくなる（`visibility-filtering/rules/tweet_rules.rs:884-889`）
+   - 正当な理由がある場合のみ異議申し立てが可能 → https://help.x.com/forms/ipi/dmca-counternotice
+3. **固定ポストのリンクを確認する**
+   - 短縮URLや評判の悪いドメインへのリンクを固定していると、アカウントごと 7 日間 `SpamHighRecall` が付く
+4. **プロフィールを整える**
+   - 閲覧者が「新しいアカウント（作成72時間未満）」「メール未確認」「電話番号未認証」「デフォルトのプロフィール画像」を非表示にするフィルタを使っている場合、フォロー外のその人には表示されない
+     （`visibility-filtering/rules/author_rules.rs:110-146`, `visibility-filtering/hydration/decode/author.rs:159`）
+   - → **メール確認・電話番号認証・アイコン設定**は必ず済ませる
+
+ラベルが付いていたら、**原因になった行動をやめて有効期限（7〜30日）が過ぎるのを待つ**のが基本。
+スパム系ラベルには Under the Hood 上で異議申し立ての導線が用意されていない。
+
+---
+
+## 3. 切り抜きアカウントとして絶対に避けること
+
+| やってはいけないこと | 理由（コード上） |
+| --- | --- |
+| **許可のない転載** | 著作権侵害の通報（DMCA）を受けると、投稿は全世界で非表示（`visibility-filtering/models/tweet.rs:102-118`, `visibility-filtering/rules/tweet_rules.rs:244-249`）。最優先で @_cassis_milk の切り抜きガイドラインを確認し、必要なら許可を取る |
+| **毎回同じ本文テンプレート**（例：毎回同じ「【切り抜き】〇〇 #〇〇 #〇〇」） | ほぼ同一の本文をまとめて `COPYPASTA_SPAM` を付けるジョブがある。日本語用の文字単位版もある（`botmaker-rules/scarecrow/bot/BBQDuplicateTextProd.bot`） |
+| **同じ文面の宣伝リプライ／フォロー外の人へのメンション＋リンク** | 重複文面のリプライ検出、低品質URL＋フォロー外メンションで `SPAM_HIGH_RECALL`（`LQ_Tweets_With_LQ_URL_Verdict_At_Mention_To_NonFollower.bot`） |
+| **大きいスレッドへの宣伝リプライ** | LLM がスパム判定すると、そのリプライは 14 日間フォロー外から見えなくなる（`grox/flows/reply_spam/`, `GroxTweetProcessor.bot`） |
+| **短縮URL・不明なドメインへのリンク** | リダイレクトの途中に1つでも低品質判定のURLがあればスパムラベル（`..._v2.bot`） |
+| **機械的な行動**（1秒以内の連続操作、一定間隔の自動いいね・フォロー、フォロー＆リムーブ） | 行動系列からボットを検出するモデルがある（`bdsm/rust/abuse-v3-features/src/derived.rs`） |
+| **ブロック・通報されやすい投稿** | フォロー外からのいいねに対するブロック・スパム報告の比率でアカウントにラベルが付く。新規アカウントは分母（いいね）が小さいので、数件の通報でも比率が跳ね上がる（`agatha/scalding/labels/rate_based_labels/RateBasedLabels.scala`） |
+
+---
+
+## 4. 伸ばすためにやること
+
+### 4-1. 投稿は「オリジナル投稿」で、動画を直接アップする
+- フォロー外の人のおすすめには、**リポスト・リプライは出ない**（`OONRetweetReplyFilter`）
+- 新規作者ブースト（後述）も**オリジナル投稿のみ**が対象
+
+### 4-2. 新規作者ブーストを活かす（投稿後 2 時間が勝負）
+`home-mixer/scorers/author_cold_start.rs`, `home-mixer/params/param.rs:608-680`
+
+- 条件: フォロワー **5万人以下**、投稿後 **2時間以内**、ホームでの表示 **200回未満**
+- 選ばれた投稿は、閲覧者のおすすめで**15位相当まで引き上げられる**
+- 選ばれる確率は「いいね数 ÷ 表示数」で決まる（Thompson サンプリング、事前分布 Beta(0.75, 49.25)）
+- → **最初の表示で「いいね」されるかがすべて**。冒頭1〜2秒で掴む動画・サムネ・1行目にする
+- → 1日に何本か、**時間をずらして**投稿すれば、ブーストの機会が投稿ごとに得られる
+
+### 4-3. スコアの重み（何が効くか）
+`home-mixer/params/param.rs:404-533`。重みは「閲覧者がその行動をとる**予測確率**」に掛かる（実際のいいね数に掛かるのではない）。
+
+| 行動 | 重み | 示唆 |
+| --- | --- | --- |
+| リンクをコピーして共有 | **20.0** | 「友達に送りたくなる」名場面が最強 |
+| リプライ / 引用 / DM で共有 | **5.0** | 会話が生まれる一言を添える（「このシーン何回見ても笑う」など） |
+| 作者をフォロー | 4.0 | プロフィールを見て「フォローしたくなる」一貫性を出す |
+| 共有 | 2.1 | |
+| リポスト | 1.0 | |
+| いいね | 0.7 | |
+| 興味がない | **-53.1** | 釣りタイトル・期待外れの内容は大きく減点 |
+| ミュート | **-58.8** | 投稿しすぎ・同じ内容の連投は避ける |
+| ブロック | -31.2 | |
+| 通報 | **-234.0** | 無断転載・センシティブな場面の切り抜きは避ける |
+
+### 4-4. 最後まで見られる動画にする
+- 2026年10月の更新で、**滞在時間の予測**と**最後まで見られた投稿**の推薦が強化された（`phoenix/xrex/models/recsys_model.py`, `phoenix/xrex/configs/xrecsys_two_tower.py`）
+- すぐスクロールされると減点（not dwelled）
+- → **短く、オチまで見たくなる構成**にする。前置きは削る
+
+### 4-5. 投稿間隔をあける
+- 同じ作者の投稿は、同じ閲覧者のタイムライン内で 2本目×0.625、3本目×0.4375…と減衰し、最小で×0.25（`vm-ranker/params.rs:175-192`）
+- フォロー外の投稿はもともと×0.75
+- 投稿は48時間を過ぎるとおすすめの候補から外れる（`home-mixer/params/config.rs:39`）
+- → 連投より、**1日数本を時間をずらして**、毎日続けるほうが有利
+
+### 4-6. 刺さる層の「いいね」を集める
+- SimClusters（フォロー外への推薦経路の一つ）は「誰にいいねされたか」で投稿の位置づけを決める（`home-mixer/sources/simclusters_source.rs`）
+- → @_cassis_milk のファン層にいいねされると、同じ興味の人へ広がりやすい
+- ハッシュタグがランキングに効くロジックはコードに見当たらない。付けすぎず、検索用に最小限にする
+
+### 4-7. アカウントの信用スコアを上げる（user-cred）
+`user-cred-v2/`
+
+- フォローグラフ上の PageRank でアカウントの信用度を算出している
+- **信用度の高いアカウントからのフォロー・いいね・リポスト**で上がる
+- X Premium のアカウントは初期配分を受けられる
+- スコアが54以上になると、重複本文などの自動スパムルールの対象外になる（`botmaker-rules/scarecrow/derived-feature/HighPageRankThreshold.df`）
+- → 本人や関係者のアカウントとの自然なつながり、Premium 加入は効果がある。ただし相互いいね集団のような組織的な水増しは、ボット検出の対象（EngagementAmplifier）
+
+---
+
+## 5. @kkk4oru（個人アカウント）との連携
+
+- @kkk4oru から @cassismilcrip をフォローし、良い投稿は**引用ポスト（一言コメント付き）**で紹介する
+  - 引用の重みは 5.0、リポストは 1.0
+- 同じ宣伝文の繰り返しや、2つのアカウントで同じ文面を投稿するのは避ける（重複本文の検出）
+- 2アカウント間での機械的な相互いいね・リポストはしない
+
+---
+
+## 6. 週次チェックリスト
+
+- [ ] Under the Hood でラベルを確認した
+- [ ] DMCA・警告の通知がないことを確認した
+- [ ] 本文テンプレートを毎回変えている
+- [ ] 投稿はオリジナル投稿（動画を直接アップ）にしている
+- [ ] 投稿後2時間の反応（いいね率）を `analytics/` に記録した
+- [ ] よく伸びた投稿・伸びなかった投稿の共通点をメモした
