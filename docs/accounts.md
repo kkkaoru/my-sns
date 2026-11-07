@@ -6,7 +6,8 @@
 | プラットフォーム | account-id | アカウント名 | URL | 役割 | ステータス |
 | --- | --- | --- | --- | --- | --- |
 | YouTube | | | | | |
-| 𝕏 | | | | | |
+| 𝕏 | kkk4oru | kkk4oru | https://x.com/kkk4oru | 個人アカウント | 運用中 |
+| 𝕏 | cassismilcrip | cassismilcrip | https://x.com/cassismilcrip | @_cassis_milk の配信切り抜き | 運用中 |
 | TikTok | | | | | |
 | Instagram | | | | | |
 

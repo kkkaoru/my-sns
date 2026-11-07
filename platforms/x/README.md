@@ -10,7 +10,8 @@
 
 | account-id | アカウント名 | URL | ステータス |
 | --- | --- | --- | --- |
-| | | | |
+| [kkk4oru](accounts/kkk4oru/) | kkk4oru（個人） | https://x.com/kkk4oru | 運用中 |
+| [cassismilcrip](accounts/cassismilcrip/) | cassismilcrip（切り抜き） | https://x.com/cassismilcrip | 運用中 |
 
 ## 構成
 
