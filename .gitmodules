@@ -1,0 +1,3 @@
+[submodule "platforms/x/x-algorithm"]
+	path = platforms/x/x-algorithm
+	url = git@github.com:xai-org/x-algorithm.git

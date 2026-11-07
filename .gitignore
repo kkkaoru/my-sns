@@ -147,3 +147,21 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# ---- SNS 運用 ----
+# 大容量のメディアファイルは Git 管理しない
+*.mp4
+*.mov
+*.m4v
+*.avi
+*.mkv
+*.wav
+*.aiff
+*.prproj
+*.aep
+*.fcpbundle/
+*.drp
+
+# OS
+.DS_Store
+Thumbs.db
