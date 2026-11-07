@@ -57,6 +57,20 @@ x-algorithm に「shadowban」という名前のラベルはない。実体は *
      （`visibility-filtering/rules/author_rules.rs:110-146`, `visibility-filtering/hydration/decode/author.rs:159`）
    - → **メール確認・電話番号認証・アイコン設定**は必ず済ませる
 
+### 検索（ハッシュタグ検索）に出ない場合
+
+検索結果の表示ルールそのものはこのリポジトリに**含まれていない**（visibility-filtering の判定レベルはホーム・おすすめ・通知だけ）。
+ただし、検索向けとみられるラベルを付けるルールが2つある。ラベルを読む側（検索）のコードは非公開。
+
+| ルール | 付くラベル | 条件 | 期間 |
+| --- | --- | --- | --- |
+| `botmaker-rules/scarecrow/bot/AgathaSpamProduction__ApplySearchTopTweetLabel.bot`（名前に SearchTopTweet） | 投稿に `AGATHA_SPAM` | アカウントの「スパム報告 ÷ いいね」スコアが 0.9975 超、または凍結アカウントとの類似スコアが 0.98 超。条件を満たす間は**新しい投稿すべて**に付く | 各投稿 7 日 |
+| `botmaker-rules/scarecrow/bot/Tweet_Search_Blacklist_RTF_All_UNSAFE_URL_Sources.bot` | 投稿に `SEARCH_BLACKLIST` / `DO_NOT_AMPLIFY` / `MALICIOUS_URL` | 危険（UNSAFE）判定のURLを含む | 期限なし |
+
+- どちらも「信用スコアが高いアカウント」「政府認証アカウント」は対象外。新規アカウントは対象になる
+- 確認するときは「話題」タブ（ランキングあり）ではなく「**最新**」タブで見る。ランキングで下がっただけの投稿は「最新」には出る
+- 「最新」タブにも出ないなら、アカウント単位で検索から外されている可能性が高い。上の「避けること」を守って様子を見る
+
 ラベルが付いていたら、**原因になった行動をやめて有効期限（7〜30日）が過ぎるのを待つ**のが基本。
 ラベルの有無を直接確かめる手段がないので、**3章の「避けること」を全部やめた状態で 30 日続ける**のが確実。
 スパム系ラベルには異議申し立ての導線が用意されていない。
