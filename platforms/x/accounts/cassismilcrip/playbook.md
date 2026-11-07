@@ -64,7 +64,7 @@ x-algorithm に「shadowban」という名前のラベルはない。実体は *
 
 | ルール | 付くラベル | 条件 | 期間 |
 | --- | --- | --- | --- |
-| `botmaker-rules/scarecrow/bot/AgathaSpamProduction__ApplySearchTopTweetLabel.bot`（名前に SearchTopTweet） | 投稿に `AGATHA_SPAM` | アカウントの「スパム報告 ÷ いいね」スコアが 0.9975 超、または凍結アカウントとの類似スコアが 0.98 超。条件を満たす間は**新しい投稿すべて**に付く | 各投稿 7 日 |
+| `botmaker-rules/scarecrow/bot/AgathaSpamProduction__ApplySearchTopTweetLabel.bot`（名前に SearchTopTweet） | 投稿に `AGATHA_SPAM` | アカウントの「スパム報告 ÷ いいね」スコアが 0.9975 超、または「スパムで凍結される可能性」の予測スコアが 0.98 超。条件を満たす間は**新しい投稿すべて**に付く | 各投稿 7 日 |
 | `botmaker-rules/scarecrow/bot/Tweet_Search_Blacklist_RTF_All_UNSAFE_URL_Sources.bot` | 投稿に `SEARCH_BLACKLIST` / `DO_NOT_AMPLIFY` / `MALICIOUS_URL` | 危険（UNSAFE）判定のURLを含む | 期限なし |
 
 - どちらも「信用スコアが高いアカウント」「政府認証アカウント」は対象外。新規アカウントは対象になる
