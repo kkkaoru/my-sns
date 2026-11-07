@@ -1,6 +1,7 @@
 ---
 title: 
 platform: youtube | x | tiktok | instagram
+account: <account-id>
 format: 
 status: draft
 scheduled_at: 
