@@ -3,12 +3,13 @@ title: アカペラ × オケ MIX 動画
 platform: x
 account: cassismilcrip
 format: 動画（オリジナル投稿 or 引用ポスト）
-status: draft
+status: published
 source: https://x.com/_cassis_milk/status/2118961097894134175
 scheduled_at:
-published_at:
-url:
-related: []
+published_at: 2026-11-07T21:40:12+09:00
+url: https://x.com/cassismilcrip/status/2119047263716860363
+related:
+  - https://x.com/_cassis_milk/status/2119047808284229948  # @_cassis_milk による引用ポスト（21:42）
 ---
 
 # 投稿前チェック（権利）
@@ -37,3 +38,21 @@ MIX: @cassismilcrip
 - 動画は直接アップロード（リンクではなく）
 - 元ポストへの「リプライ」ではなく、元ポストを引用 or 単独のオリジナル投稿
 - 投稿後 2 時間の反応を記録
+
+# 投稿後の記録
+
+| 時刻 | 出来事 |
+| --- | --- |
+| 2026-11-07 15:57 | 元ポスト（@_cassis_milk のアカペラ） |
+| 2026-11-07 21:40 | @cassismilcrip が投稿 |
+| 2026-11-07 | @kkk4oru がリポスト |
+| 2026-11-07 21:42 | @_cassis_milk が引用ポスト |
+| 2026-11-07 | @cassismilcrip が引用ポストに返信 |
+
+## 数値
+
+| 経過 | 表示 | いいね | リポスト | 引用 | 返信 | ブックマーク | フォロワー増 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2時間（23:40） | | | | | | | |
+| 24時間（11/8 21:40） | | | | | | | |
+| 48時間（11/9 21:40） | | | | | | | |
