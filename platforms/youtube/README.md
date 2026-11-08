@@ -1,5 +1,7 @@
 # YouTube
 
+運用の指針は [公式情報ベースの運用ガイド](guide.md) を参照。
+
 アカウントごとに `accounts/<account-id>/` を作成して運用します。
 
 ```bash
