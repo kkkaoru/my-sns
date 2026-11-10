@@ -220,8 +220,13 @@ x-algorithm に「shadowban」という名前のラベルはない。実体は *
 - 効くのは**相手への通知**。通知のフィルタは種類で違う（`visibility-filtering/rules/levels.rs`）
   - メンション・リプライの通知: 投稿に低品質・スパム・重複メンションなどのラベルがあると相手に届かない
   - メディアのタグ付けの通知: 投稿ラベルによる除外がほとんどない（相手の「フォローしている人のみ」設定は効く）
-  - どちらも、作者アカウントのラベル（新規・スパム系など）があると、相手がフォローしていない場合は届かない
-- → @_cassis_milk に確実に気づいてもらうなら、本人にフォローしてもらった上でタグ付けかメンションをする
+  - 作者アカウントのラベルによる通知の除外（`visibility-filtering/rules/author_rules.rs`）
+    - **相手がフォローしていても届かない**: `SpamHighRecall` / `Compromised` / `ReadOnly` / `ImpersonationHighPrecision`
+    - **相手がフォローしていれば届く**: `NotGraduated` / `AgathaSpamTopUser` / `EngagementSpammer` / `BlinkWorst` / `DownrankSpamReply` / `AbusiveHighRecall`
+- @_cassis_milk には**フォローされている**（2026-11 時点）
+  - @cassismilcrip の投稿は本人のタイムラインでは「フォロー中」扱いになり、おすすめ向けのラベル除外を受けない
+  - フォローは信用スコア（user-cred）の PageRank で @_cassis_milk から @cassismilcrip へ評価が流れる経路になる（`user-cred-v2/`）
+  - それでも `SpamHighRecall` が付くと通知・タイムラインとも本人に届かなくなるので、3章の「避けること」は引き続き守る
 - 関係ない人をタグ付け・メンションしない（通報・ブロックの原因になる）
 
 ### 4-7. アカウントの信用スコアを上げる（user-cred）
